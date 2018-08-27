@@ -53,9 +53,9 @@ object Complex {
 
   def conjugate(c: Complex): Complex = Complex(c.re, -c.im)
 
-  def modSqr(c: Complex): Double = c.re * c.re + c.im * c.im
+  def absSqr(c: Complex): Double = c.re * c.re + c.im * c.im
 
-  def mod(c: Complex): Double = Math.sqrt(modSqr(c))
+  def abs(c: Complex): Double = Math.sqrt(absSqr(c))
 
-  def inverse(c: Complex): Complex = conjugate(c) * (1 / modSqr(c))
+  def inverse(c: Complex): Complex = conjugate(c) * (1 / absSqr(c))
 }
