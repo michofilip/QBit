@@ -16,4 +16,6 @@ object Main extends App {
     val c2 = 1 + 2 * i
     println(c1 == c2)
     
+    println(ComplexVector(1, 0) dot ComplexVector(0, 1))
+    
 }
