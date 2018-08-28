@@ -5,7 +5,7 @@ import complex.Complex._
 import scala.language.implicitConversions
 
 class Complex(val re: Double, val im: Double) {
-    def unary_+ : Complex = Complex(re, im)
+    def unary_+ : Complex = this
     
     def unary_- : Complex = Complex(-re, -im)
     
@@ -15,7 +15,15 @@ class Complex(val re: Double, val im: Double) {
     
     def *(that: Complex): Complex = Complex(this.re * that.re - this.im * that.im, this.re * that.im + this.im * that.re)
     
-    def /(that: Complex): Complex = this * inverse(that)
+    def /(that: Complex): Complex = this * that.inverse
+    
+    def conjugate: Complex = Complex(re, -im)
+    
+    def absSqr: Double = re * re + im * im
+    
+    def abs: Double = Math.sqrt(absSqr)
+    
+    def inverse: Complex = conjugate * (1 / absSqr)
     
     override def toString: String = {
         if (re > 0 && im > 0) {
@@ -62,11 +70,5 @@ object Complex {
     
     implicit def int2Complex(x: Int): Complex = Complex(x, 0)
     
-    def conjugate(c: Complex): Complex = Complex(c.re, -c.im)
     
-    def absSqr(c: Complex): Double = c.re * c.re + c.im * c.im
-    
-    def abs(c: Complex): Double = Math.sqrt(absSqr(c))
-    
-    def inverse(c: Complex): Complex = conjugate(c) * (1 / absSqr(c))
 }

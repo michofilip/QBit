@@ -1,20 +1,18 @@
 package complex
 
-class ComplexVector private(val dimension: Int, _coefficients: Map[Int, Complex]) {
-    private val coefficients: Map[Int, Complex] = _coefficients.filterNot {
+class ComplexVector private(val dimension: Int, _coefficientMap: Map[Int, Complex]) {
+    private val coefficientMap: Map[Int, Complex] = _coefficientMap.filterNot {
         case (_, c) => c == Complex(0)
     }
     
-    //    def get(index: Int): Option[Complex] = coefficients.get(index)
-    
-    def apply(index: Int): Complex = {
-        require(1 <= index && index <= dimension)
-        coefficients.getOrElse(index, Complex(0))
+    def apply(i: Int): Complex = {
+        require(1 <= i && i <= dimension)
+        coefficientMap.getOrElse(i, Complex(0))
     }
     
-    def unary_+ : ComplexVector = new ComplexVector(dimension, coefficients)
+    def unary_+ : ComplexVector = this
     
-    def unary_- : ComplexVector = new ComplexVector(dimension, coefficients.mapValues(c => -c))
+    def unary_- : ComplexVector = new ComplexVector(dimension, coefficientMap.mapValues(c => -c))
     
     def +(that: ComplexVector): ComplexVector = {
         require(this.dimension == that.dimension)
@@ -23,12 +21,16 @@ class ComplexVector private(val dimension: Int, _coefficients: Map[Int, Complex]
     
     def -(that: ComplexVector): ComplexVector = this + -that
     
-    def *(complex: Complex): ComplexVector = new ComplexVector(dimension, coefficients.mapValues(c => c * complex))
+    def *(complex: Complex): ComplexVector = new ComplexVector(dimension, coefficientMap.mapValues(c => c * complex))
+    
+    def /(complex: Complex): ComplexVector = this * (1 / complex)
     
     def dot(that: ComplexVector): Complex = {
         require(this.dimension == that.dimension)
         (for (i <- 1 to dimension) yield apply(i) * that.apply(i)).foldLeft(Complex(0))(_ + _)
     }
+    
+    def conjugate: ComplexVector = new ComplexVector(dimension, coefficientMap.mapValues(c => c.conjugate))
     
     override def toString: String = (for (i <- 1 to dimension) yield apply(i)).mkString("(", ", ", ")")
 }
@@ -39,10 +41,10 @@ object ComplexVector {
         def *(complexVector: ComplexVector): ComplexVector = complexVector * x
     }
     
-    def apply(complexSeq: Complex*): ComplexVector = {
-        val dimension = complexSeq.length
-        val coefficients = (1 to dimension).zip(complexSeq).toMap
-        new ComplexVector(dimension, coefficients)
+    def apply(coefficients: Complex*): ComplexVector = {
+        val dimension = coefficients.length
+        val coefficientMap = (1 to dimension).zip(coefficients).toMap
+        new ComplexVector(dimension, coefficientMap)
     }
     
 }

@@ -17,5 +17,6 @@ object Main extends App {
     println(c1 == c2)
     
     println(ComplexVector(1, 0) dot ComplexVector(0, 1))
+    println(ComplexVector.conjugate(v1) / 2)
     
 }
