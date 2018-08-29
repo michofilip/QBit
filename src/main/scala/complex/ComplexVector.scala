@@ -30,6 +30,10 @@ class ComplexVector private(val dimension: Int, _coefficientMap: Map[Int, Comple
         (for (i <- 1 to dimension) yield apply(i) * that.apply(i)).foldLeft(Complex(0))(_ + _)
     }
     
+    def tensorProduct(that: ComplexVector): ComplexVector = {
+        ComplexVector((for (i1 <- 1 to dimension; i2 <- 1 to that.dimension) yield apply(i1) * that.apply(i2)): _*)
+    }
+    
     def conjugate: ComplexVector = new ComplexVector(dimension, coefficientMap.mapValues(c => c.conjugate))
     
     override def toString: String = (for (i <- 1 to dimension) yield apply(i)).mkString("(", ", ", ")")

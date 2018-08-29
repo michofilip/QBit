@@ -1,5 +1,7 @@
 package complex
 
+import format.StringFormat.Fit
+
 class ComplexMatrix(val dimension: Int, _coefficientMap: Map[(Int, Int), Complex]) {
     private val coefficientMap: Map[(Int, Int), Complex] = _coefficientMap.filterNot {
         case (_, c) => c == Complex(0)
@@ -25,14 +27,51 @@ class ComplexMatrix(val dimension: Int, _coefficientMap: Map[(Int, Int), Complex
     
     def /(complex: Complex): ComplexMatrix = this * (1 / complex)
     
-    def *(complex: ComplexMatrix): ComplexMatrix = {
+    def *(that: ComplexMatrix): ComplexMatrix = {
+        require(this.dimension == that.dimension)
         
+        val coefficients = for (i <- 1 to dimension; j <- 1 to dimension) yield
+            (for (t <- 1 to dimension) yield apply(i, t) * that.apply(t, j)).foldLeft(Complex(0))(_ + _)
         
-        ???
+        ComplexMatrix(coefficients: _*)
+    }
+    
+    def *(complexVector: ComplexVector): ComplexVector = {
+        require(dimension == complexVector.dimension)
+        
+        val coefficients = for (i <- 1 to dimension)
+            yield (for (j <- 1 to dimension) yield apply(i, j) * complexVector(j)).foldLeft(Complex(0))(_ + _)
+        
+        ComplexVector(coefficients: _*)
     }
     
     def conjugate: ComplexMatrix = new ComplexMatrix(dimension, coefficientMap.mapValues(c => c.conjugate))
     
+    def transpose: ComplexMatrix = new ComplexMatrix(dimension, coefficientMap.map {
+        case ((i, j), c) => ((j, i), c)
+    })
+    
+    def tensorProduct(that: ComplexMatrix): ComplexMatrix = {
+        ComplexMatrix((for (i1 <- 1 to dimension; i2 <- 1 to dimension; j1 <- 1 to that.dimension; j2 <- 1 to dimension)
+            yield apply(i1, j1) * that.apply(i2, j2)): _*)
+    }
+    
+    override def toString: String = {
+        val columns: IndexedSeq[IndexedSeq[Complex]] = for (j <- 1 to dimension) yield for (i <- 1 to dimension) yield apply(i, j)
+        val maxLengths: IndexedSeq[Int] = columns.map(column => column.map(c => c.toString.length).max)
+        val columnsStr: IndexedSeq[IndexedSeq[String]] = columns.zip(maxLengths).map {
+            case (column, max) => column.map(c => c.toString.justRight(max))
+        }
+        
+        (for (i <- 1 to dimension) yield (for (j <- 1 to dimension) yield columnsStr(j - 1)(i - 1)).mkString("|", ", ", "|")).mkString("\n")
+    }
+    
+    override def hashCode(): Int = coefficientMap.hashCode()
+    
+    override def equals(obj: scala.Any): Boolean = obj match {
+        case m: ComplexMatrix => coefficientMap == m.coefficientMap
+        case _ => false
+    }
 }
 
 object ComplexMatrix {

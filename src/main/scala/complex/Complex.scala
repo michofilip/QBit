@@ -1,10 +1,14 @@
 package complex
 
 import complex.Complex._
+import format.NumberFormat.Trim
 
 import scala.language.implicitConversions
 
-class Complex(val re: Double, val im: Double) {
+class Complex(_re: Double, _im: Double) {
+    val re: Double = _re.trim(10)
+    val im: Double = _im.trim(10)
+    
     def unary_+ : Complex = this
     
     def unary_- : Complex = Complex(-re, -im)
@@ -26,24 +30,23 @@ class Complex(val re: Double, val im: Double) {
     def inverse: Complex = conjugate * (1 / absSqr)
     
     override def toString: String = {
-        if (re > 0 && im > 0) {
-            f"$re%.3f+$im%.3fi".replace(',', '.')
-        } else if (re > 0 && im < 0) {
-            f"$re%.3f$im%.3fi".replace(',', '.')
-        } else if (re > 0 && im == 0) {
-            f"$re%.3f".replace(',', '.')
-        } else if (re < 0 && im > 0) {
-            f"$re%.3f+$im%.3fi".replace(',', '.')
-        } else if (re < 0 && im < 0) {
-            f"$re%.3f$im%.3fi".replace(',', '.')
-        } else if (re < 0 && im == 0) {
-            f"$re%.3f".replace(',', '.')
-        } else if (re == 0 && im > 0) {
-            f"$im%.3fi".replace(',', '.')
-        } else if (re == 0 && im < 0) {
-            f"$im%.3fi".replace(',', '.')
+        val trimRe = re.trim(3)
+        val trimIm = im.trim(3)
+        
+        if (trimRe == 0) {
+            if (trimIm == 0) {
+                trimRe.toString
+            } else {
+                trimIm + "i"
+            }
         } else {
-            "0.000"
+            if (trimIm == 0) {
+                trimRe.toString
+            } else if (trimIm > 0) {
+                trimRe + "+" + trimIm + "i"
+            } else {
+                trimRe + "" + trimIm + "i"
+            }
         }
     }
     
