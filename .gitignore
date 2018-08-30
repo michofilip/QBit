@@ -1,1 +1,10 @@
+target
 *.class
+
+*.iml
+*.ipr
+*.iws
+.idea
+out
+
+build.properties
