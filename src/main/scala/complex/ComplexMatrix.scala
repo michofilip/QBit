@@ -52,7 +52,7 @@ class ComplexMatrix(val dimension: Int, _coefficientMap: Map[(Int, Int), Complex
     })
     
     def tensorProduct(that: ComplexMatrix): ComplexMatrix = {
-        ComplexMatrix((for (i1 <- 1 to dimension; i2 <- 1 to dimension; j1 <- 1 to that.dimension; j2 <- 1 to dimension)
+        ComplexMatrix((for (i1 <- 1 to dimension; i2 <- 1 to that.dimension; j1 <- 1 to dimension; j2 <- 1 to that.dimension)
             yield apply(i1, j1) * that.apply(i2, j2)): _*)
     }
     
@@ -99,4 +99,11 @@ object ComplexMatrix {
     
     def id(dimension: Int): ComplexMatrix = diagonal(Seq.fill(dimension)(Complex(1)): _*)
     
+    def pow(matrix: ComplexMatrix, n: Int): ComplexMatrix = {
+        require(n >= 0)
+        
+        def p(m: ComplexMatrix, n: Int): ComplexMatrix = if (n > 0) p(m * matrix, n - 1) else m
+        
+        p(id(matrix.dimension), n)
+    }
 }

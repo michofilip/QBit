@@ -36,6 +36,12 @@ class ComplexVector private(val dimension: Int, _coefficientMap: Map[Int, Comple
     
     def conjugate: ComplexVector = new ComplexVector(dimension, coefficientMap.mapValues(c => c.conjugate))
     
+    def lengthSqr: Double = (for (i <- 1 to dimension) yield apply(i).absSqr).sum
+    
+    def length: Double = Math.sqrt(lengthSqr)
+    
+    def normalize: ComplexVector = this / length
+    
     override def toString: String = (for (i <- 1 to dimension) yield apply(i)).mkString("(", ", ", ")")
 }
 

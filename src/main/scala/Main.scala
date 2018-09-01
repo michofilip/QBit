@@ -1,5 +1,5 @@
 import complex.Complex._
-import complex.{ComplexMatrix, ComplexVector}
+import complex.{ComplexMatrix, ComplexVector, QuantumGate, QuantumState}
 import format.NumberFormat.Trim
 import format.StringFormat.Fit
 
@@ -68,4 +68,31 @@ object Main extends App {
     
     
     println(m2 * ComplexVector(1, 2))
+    
+    val qs = QuantumState(1, 1, 1, 1)
+    println(qs)
+    
+    println()
+    println(QuantumGate.I)
+    println()
+    println(QuantumGate.X)
+    println()
+    println(QuantumGate.Y)
+    println()
+    println(QuantumGate.Z)
+    println()
+    println(QuantumGate.R(Math.PI / 4))
+    println()
+    println(QuantumGate.H)
+    println()
+    println(QuantumGate.SWAP)
+    println()
+    println(QuantumGate.CNOT)
+    println()
+    println(QuantumGate.CCNOT)
+    println()
+    println(QuantumGate.controlled(QuantumGate.SWAP, true, true))
+    println()
+    
+    
 }
