@@ -1,13 +1,13 @@
 package complex
 
 import complex.Complex._
-import format.NumberFormat.Trim
+import format.NumberFormat.Round
 
 import scala.language.implicitConversions
 
 class Complex(_re: Double, _im: Double) {
-    val re: Double = _re.trim(10)
-    val im: Double = _im.trim(10)
+    val re: Double = _re.round(10)
+    val im: Double = _im.round(10)
     
     def unary_+ : Complex = this
     
@@ -30,12 +30,12 @@ class Complex(_re: Double, _im: Double) {
     def inverse: Complex = conjugate * (1 / absSqr)
     
     override def toString: String = {
-        val trimRe = re.trim(3)
-        val trimIm = im.trim(3)
+        val trimRe = re.round(3)
+        val trimIm = im.round(3)
         
         if (trimRe == 0) {
             if (trimIm == 0) {
-                trimRe.toString
+                "0.0"
             } else {
                 trimIm + "i"
             }
@@ -72,6 +72,4 @@ object Complex {
     implicit def double2Complex(x: Double): Complex = Complex(x, 0)
     
     implicit def int2Complex(x: Int): Complex = Complex(x, 0)
-    
-    
 }

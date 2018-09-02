@@ -35,9 +35,7 @@ class QuantumState(val vector: ComplexVector) {
         }.mkString(" + ")
     }
     
-    def *(that: QuantumState): QuantumState = {
-        new QuantumState(this.vector tensorProduct that.vector)
-    }
+    def *(that: QuantumState): QuantumState = new QuantumState(this.vector tensorProduct that.vector)
     
     def applySystem(quantumSystem: QuantumSystem)(implicit random: Random): QuantumState = {
         quantumSystem.quantumGates.foldLeft(this)((qs, qg) => {
@@ -57,7 +55,7 @@ class QuantumState(val vector: ComplexVector) {
         val dim = vector.dimension
         val rand = random.nextDouble()
         
-        val selector1: Set[Int] = (1 to dim).filter(i => ((i - 1) >> (qbits - qbitNo)) % 2 == 1).toSet
+        val selector1 = (1 to dim).filter(i => ((i - 1) >> (qbits - qbitNo)) % 2 == 1).toSet
         val prob1 = selector1.foldLeft(0.0)((p, i) => p + vector(i).absSqr)
         
         val coeff = if (rand < prob1) {
@@ -81,9 +79,12 @@ object QuantumState {
         QuantumState(amp0 * Complex.expI(phase0), amp1 * Complex.expI(phase1))
     }
     
-    def qbit0: QuantumState = qbit(0)
+    def randomQbit(implicit random: Random): QuantumState =
+        qbit(random.nextDouble(), 2 * Math.PI * random.nextDouble(), 2 * Math.PI * random.nextDouble())
     
-    def qbit1: QuantumState = qbit(1)
+    def q0: QuantumState = qbit(0)
+    
+    def q1: QuantumState = qbit(1)
     
     def phi_+ : QuantumState = QuantumState(ComplexVector(1, 0, 0, 1) / Math.sqrt(2))
     

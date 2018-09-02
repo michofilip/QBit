@@ -2,7 +2,7 @@ package complex
 
 import format.StringFormat.Fit
 
-class ComplexMatrix(val dimension: Int, _coefficientMap: Map[(Int, Int), Complex]) {
+class ComplexMatrix private(val dimension: Int, _coefficientMap: Map[(Int, Int), Complex]) {
     private val coefficientMap: Map[(Int, Int), Complex] = _coefficientMap.filterNot {
         case (_, c) => c == Complex(0)
     }
@@ -18,7 +18,7 @@ class ComplexMatrix(val dimension: Int, _coefficientMap: Map[(Int, Int), Complex
     
     def +(that: ComplexMatrix): ComplexMatrix = {
         require(this.dimension == that.dimension)
-        ComplexMatrix((for (i <- 1 to dimension; j <- 1 to dimension) yield apply(i, j) + that.apply(i, j)): _*)
+        ComplexMatrix((for (i <- 1 to dimension; j <- 1 to dimension) yield this.apply(i, j) + that.apply(i, j)): _*)
     }
     
     def -(that: ComplexMatrix): ComplexMatrix = this + -that
@@ -31,16 +31,16 @@ class ComplexMatrix(val dimension: Int, _coefficientMap: Map[(Int, Int), Complex
         require(this.dimension == that.dimension)
         
         val coefficients = for (i <- 1 to dimension; j <- 1 to dimension) yield
-            (for (t <- 1 to dimension) yield apply(i, t) * that.apply(t, j)).foldLeft(Complex(0))(_ + _)
+            (for (t <- 1 to dimension) yield this.apply(i, t) * that.apply(t, j)).reduceLeft(_ + _)
         
         ComplexMatrix(coefficients: _*)
     }
     
     def *(complexVector: ComplexVector): ComplexVector = {
-        require(dimension == complexVector.dimension)
+        require(this.dimension == complexVector.dimension)
         
         val coefficients = for (i <- 1 to dimension)
-            yield (for (j <- 1 to dimension) yield apply(i, j) * complexVector(j)).foldLeft(Complex(0))(_ + _)
+            yield (for (j <- 1 to dimension) yield this.apply(i, j) * complexVector(j)).reduceLeft(_ + _)
         
         ComplexVector(coefficients: _*)
     }
@@ -52,15 +52,18 @@ class ComplexMatrix(val dimension: Int, _coefficientMap: Map[(Int, Int), Complex
     })
     
     def tensorProduct(that: ComplexMatrix): ComplexMatrix = {
-        ComplexMatrix((for (i1 <- 1 to dimension; i2 <- 1 to that.dimension; j1 <- 1 to dimension; j2 <- 1 to that.dimension)
-            yield apply(i1, j1) * that.apply(i2, j2)): _*)
+        ComplexMatrix((for (i1 <- 1 to this.dimension;
+                            i2 <- 1 to that.dimension;
+                            j1 <- 1 to this.dimension;
+                            j2 <- 1 to that.dimension)
+            yield this.apply(i1, j1) * that.apply(i2, j2)): _*)
     }
     
     override def toString: String = {
-        val columns: IndexedSeq[IndexedSeq[Complex]] = for (j <- 1 to dimension) yield for (i <- 1 to dimension) yield apply(i, j)
-        val maxLengths: IndexedSeq[Int] = columns.map(column => column.map(c => c.toString.length).max)
-        val columnsStr: IndexedSeq[IndexedSeq[String]] = columns.zip(maxLengths).map {
-            case (column, max) => column.map(c => c.toString.justRight(max))
+        val columns = for (j <- 1 to dimension) yield for (i <- 1 to dimension) yield apply(i, j)
+        val maxLengths = columns.map(column => column.map(c => c.toString.length).max)
+        val columnsStr = columns.zip(maxLengths).map {
+            case (column, max) => column.map(c => c.toString.alignRight(max))
         }
         
         (for (i <- 1 to dimension) yield (for (j <- 1 to dimension) yield columnsStr(j - 1)(i - 1)).mkString("|", ", ", "|")).mkString("\n")
@@ -98,12 +101,4 @@ object ComplexMatrix {
     }
     
     def id(dimension: Int): ComplexMatrix = diagonal(Seq.fill(dimension)(Complex(1)): _*)
-    
-    def pow(matrix: ComplexMatrix, n: Int): ComplexMatrix = {
-        require(n >= 0)
-        
-        def p(m: ComplexMatrix, n: Int): ComplexMatrix = if (n > 0) p(m * matrix, n - 1) else m
-        
-        p(id(matrix.dimension), n)
-    }
 }

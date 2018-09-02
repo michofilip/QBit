@@ -16,12 +16,10 @@ class QuantumGate(val matrix: ComplexMatrix, val measured: Set[Int]) {
     
     override def toString: String = matrix.toString
     
-    def *(that: QuantumGate): QuantumGate = {
-        new QuantumGate(
-            this.matrix tensorProduct that.matrix,
-            this.measured ++ that.measured.map(q => q + qbits)
-        )
-    }
+    def *(that: QuantumGate): QuantumGate = new QuantumGate(
+        this.matrix tensorProduct that.matrix,
+        this.measured ++ that.measured.map(q => q + qbits)
+    )
 }
 
 object QuantumGate {
@@ -116,10 +114,10 @@ object QuantumGate {
     
     def controlled(quantumGate: QuantumGate, negated: Boolean = false, under: Boolean = false): QuantumGate = {
         import ComplexMatrix.id
-        val dim = quantumGate.matrix.dimension
         
+        val dim = quantumGate.matrix.dimension
         val qbits = quantumGate.qbits + 1
-        lazy val neg: ComplexMatrix = ComplexMatrix(0, 1, 1, 0) tensorProduct id(dim)
+        lazy val neg: ComplexMatrix = NOT.matrix tensorProduct id(dim)
         lazy val shift = (for (q <- 0 to qbits - 2) yield
             id(1 << q) tensorProduct SWAP.matrix tensorProduct id(1 << (qbits - 2 - q)))
                 .reduce((acc, m) => m * acc)
@@ -129,24 +127,18 @@ object QuantumGate {
                 else if (i == j) Complex(1)
                 else Complex(0)): _*)
         
-        val matrix = if (negated && under) {
-            shift.transpose.conjugate * neg.transpose.conjugate * baseMatrix * neg * shift
-        } else if (negated && !under) {
-            neg.transpose.conjugate * baseMatrix * neg
-        } else if (!negated && under) {
-            shift.transpose.conjugate * baseMatrix * shift
-        } else {
-            baseMatrix
+        val matrix = (negated, under) match {
+            case (true, true) => shift.transpose.conjugate * neg.transpose.conjugate * baseMatrix * neg * shift
+            case (true, false) => neg.transpose.conjugate * baseMatrix * neg
+            case (false, true) => shift.transpose.conjugate * baseMatrix * shift
+            case (false, false) => baseMatrix
         }
         
         new QuantumGate(matrix, Set.empty)
     }
     
     def M: QuantumGate = {
-        val matrix = ComplexMatrix(
-            1, 0,
-            0, 1
-        )
+        val matrix = ComplexMatrix.id(2)
         new QuantumGate(matrix, Set(1))
     }
 }
