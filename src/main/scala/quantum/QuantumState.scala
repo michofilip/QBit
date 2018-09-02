@@ -47,6 +47,8 @@ class QuantumState(val vector: ComplexVector) {
 }
 
 object QuantumState {
+    def apply(vector: ComplexVector): QuantumState = new QuantumState(vector.normalize)
+    
     def apply(coefficients: Complex*): QuantumState = new QuantumState(ComplexVector(coefficients: _*).normalize)
     
     def qbit(amp1: Double, phase0: Double = 0, phase1: Double = 0): QuantumState = {
@@ -55,7 +57,7 @@ object QuantumState {
         QuantumState(amp0 * Complex.expI(phase0), amp1 * Complex.expI(phase1))
     }
     
-    def zero: QuantumState = qbit(0)
+    def qbit0: QuantumState = qbit(0)
     
-    def one: QuantumState = qbit(1)
+    def qbit1: QuantumState = qbit(1)
 }

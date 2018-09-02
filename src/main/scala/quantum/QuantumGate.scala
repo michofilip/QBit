@@ -3,7 +3,7 @@ package quantum
 import complex.Complex._
 import complex.{Complex, ComplexMatrix}
 
-class QuantumGate(private val matrix: ComplexMatrix, private val measured: Set[Int]) {
+class QuantumGate(val matrix: ComplexMatrix, val measured: Set[Int]) {
     val qbits: Int = {
         val log = Math.log(matrix.dimension) / Math.log(2)
         val logInt = log.toInt

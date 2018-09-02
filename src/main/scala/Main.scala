@@ -1,42 +1,25 @@
 import quantum.QuantumGate._
+import quantum.QuantumMachine
 import quantum.QuantumState._
-import quantum.QuantumGate
+
+import scala.util.Random
 
 object Main extends App {
+    implicit val rand: Random = new Random()
     
-    println(I)
-    println()
-    println(X)
-    println()
-    println(Y)
-    println()
-    println(Z)
-    println()
-    println(R(Math.PI / 4))
-    println()
-    println(H)
-    println()
-    println(SWAP)
-    println()
-    println(CNOT)
-    println()
-    println(CCNOT)
-    println()
-    println(controlled(QuantumGate.H, negated = true, under = true))
-    println()
+    println(QuantumMachine(qbit0 * qbit0).applyAll(H * I, CNOT))
+    println(QuantumMachine(qbit0 * qbit0).applyAll(H * I, CNOT, M * I))
+    println(QuantumMachine(qbit0 * qbit0).applyAll(H * I, CNOT, I * M))
     
-    println(zero)
-    println(one)
-    println(zero * zero)
-    println(zero * one)
-    println(one * zero)
-    println(one * one)
-    
-    println(SWAP.applyOn(zero * zero))
-    println(SWAP.applyOn(zero * one))
-    println(SWAP.applyOn(one * zero))
-    println(SWAP.applyOn(one * one))
-    println(H.applyOn(zero))
-    println(H.applyOn(one))
-    
+    println(QuantumMachine(qbit0).applyAll(M))
+    println(QuantumMachine(qbit1).applyAll(M))
+    //    println(QuantumMachine(qbit(.1)).applyOne(X))
+    //    println(QuantumMachine(qbit(.9)))
+    //    println(QuantumMachine(qbit(.9)).applyOne(X))
+    for (_ <- 1 to 100) {
+        //        println(QuantumMachine(qbit(.9)).applyAll(M))
+    }
+    println((M * I * M).measured)
+    val amp = 0.9
+    println(Math.sqrt(1 - amp * amp))
 }
