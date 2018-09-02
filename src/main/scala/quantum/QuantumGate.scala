@@ -10,7 +10,7 @@ class QuantumGate(val matrix: ComplexMatrix, val measured: Set[Int]) {
         require(logInt == log)
         logInt
     }
-    require(this.matrix * this.matrix.transpose.conjugate == ComplexMatrix.id(Math.pow(2, qbits).toInt))
+    require(this.matrix * this.matrix.transpose.conjugate == ComplexMatrix.id(1 << qbits))
     
     def invert: QuantumGate = new QuantumGate(matrix.transpose.conjugate, measured)
     
@@ -22,12 +22,6 @@ class QuantumGate(val matrix: ComplexMatrix, val measured: Set[Int]) {
             this.measured ++ that.measured.map(q => q + qbits)
         )
     }
-    
-    def applyOn(quantumState: QuantumState): QuantumState = {
-        val qs0 = new QuantumState(matrix * quantumState.vector)
-        
-        measured.foldLeft(qs0)((qs, i) => qs.measure(i))
-    }
 }
 
 object QuantumGate {
@@ -35,13 +29,6 @@ object QuantumGate {
         val matrix = ComplexMatrix.id(2)
         new QuantumGate(matrix, Set.empty)
     }
-    
-    //    def I: QuantumGate = I(1)
-    //
-    //    def I(qbits: Int): QuantumGate = {
-    //        val matrix = ComplexMatrix.id(Math.pow(2, qbits).toInt)
-    //        new QuantumGate(matrix, Set.empty)
-    //    }
     
     def X: QuantumGate = {
         val matrix = ComplexMatrix(
@@ -134,7 +121,7 @@ object QuantumGate {
         val qbits = quantumGate.qbits + 1
         lazy val neg: ComplexMatrix = ComplexMatrix(0, 1, 1, 0) tensorProduct id(dim)
         lazy val shift = (for (q <- 0 to qbits - 2) yield
-            id(Math.pow(2, q).toInt) tensorProduct SWAP.matrix tensorProduct id(Math.pow(2, qbits - 2 - q).toInt))
+            id(1 << q) tensorProduct SWAP.matrix tensorProduct id(1 << (qbits - 2 - q)))
                 .reduce((acc, m) => m * acc)
         val baseMatrix = ComplexMatrix(
             (for (i <- 1 to 2 * dim; j <- 1 to 2 * dim) yield
@@ -157,17 +144,9 @@ object QuantumGate {
     
     def M: QuantumGate = {
         val matrix = ComplexMatrix(
-            0, 1,
-            1, 0
+            1, 0,
+            0, 1
         )
         new QuantumGate(matrix, Set(1))
     }
-    
-    //    def repeat(quantumGate: QuantumGate, n: Int): QuantumGate = {
-    //        require(n >= 0)
-    //
-    //        def p(q: QuantumGate, n: Int): QuantumGate = if (n > 0) repeat(q * quantumGate, n - 1) else q
-    //
-    //        p(new QuantumGate(ComplexMatrix(1), Set.empty), n)
-    //    }
 }

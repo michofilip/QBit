@@ -1,25 +1,23 @@
 import quantum.QuantumGate._
-import quantum.QuantumMachine
 import quantum.QuantumState._
+import quantum.QuantumSystem._
 
 import scala.util.Random
 
 object Main extends App {
     implicit val rand: Random = new Random()
     
-    println(QuantumMachine(qbit0 * qbit0).applyAll(H * I, CNOT))
-    println(QuantumMachine(qbit0 * qbit0).applyAll(H * I, CNOT, M * I))
-    println(QuantumMachine(qbit0 * qbit0).applyAll(H * I, CNOT, I * M))
-    
-    println(QuantumMachine(qbit0).applyAll(M))
-    println(QuantumMachine(qbit1).applyAll(M))
-    //    println(QuantumMachine(qbit(.1)).applyOne(X))
-    //    println(QuantumMachine(qbit(.9)))
-    //    println(QuantumMachine(qbit(.9)).applyOne(X))
-    for (_ <- 1 to 100) {
-        //        println(QuantumMachine(qbit(.9)).applyAll(M))
+    val state = qbit(.5) * qbit0 * qbit0
+    val teleportation = I * H * I > I * CNOT > CNOT * I > H * I * I > I * CNOT > C(I * Z) > M * M * I
+    println(state)
+    println()
+    for (_ <- 1 to 10) {
+        val qs = state applySystem teleportation
+        println(qs)
     }
-    println((M * I * M).measured)
-    val amp = 0.9
-    println(Math.sqrt(1 - amp * amp))
+    
+    val state1 = qbit0 * qbit1 * qbit0 * qbit0
+    val superdensecoding = I * I * H * I > I * I * CNOT > I * CNOT * I > C(I * Z) * I > I * I * CNOT > I * I * H * I > I * I * M * M
+    
+    println(state1.applySystem(superdensecoding))
 }
